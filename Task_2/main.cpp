@@ -1,48 +1,50 @@
-#include "modAlphaCipher.h"
+#include  "coder.cpp"
+#include <locale>
+using namespace std;
 
-
-bool isValid(const string& s)
+bool isValid(const wstring& s)
 {
-    for(const auto &c:s) // цикл проходит по всему массиву и выдает сам объект этого массива
-        if (!isalpha(c) )
+
+    for (auto c:s)
+        if (!iswalpha(c) || !iswupper(c))
             return false;
     return true;
-    
 }
 
-
-int main(int argc, char **argv)
+int main()
 {
+    locale loc("ru_RU.UTF-8");
+    locale::global(loc);
     int key;
-    string st;
-    unsigned operation;
-    cout<<"ВВЕДИТЕ КЛЮЧ (ЧИСЛО) : ";
-    cin>>key;
-    if (!cin.good()) {
-        clog<<"КЛЮЧ НЕ ПОДХОДИТ\n";
-        return 1;
+    wstring text;
+    int op;
+    wcout<<L"<Крипер> готов. Введи ключ (целое число): ";
+    wcin>>key;
+    if (!wcin.good()) {
+        wcerr<<L"ключ недействителен.\n";
+        return 0;
     }
-    cout<<"КЛЮЧ ПРИНЯТ\n";
-    modAlphaCipher cipher(key);
+
+    coder cipher(key);
     do {
-        cout<<"ВЫБЕРИТЕ ОПЕРАЦИЮ (0-ВЫХОД, 1-ЗАШИФРОВАТЬ, 2-РАСШИФРОВАТЬ): ";
-        cin>>operation;
-        if (operation > 2) {
-            cout<<"ОШИБКА В ВЫБОРЕ ОПЕРАЦИИ\n";
-        } else if (operation >0) {
-            cout<<"ВВЕДИТЕ СТРОКУ, СОСТОЯЩУЮ ИЗ ЛАТИНИЦЫ : ";
-            cin>>st;
-            if (isValid(st)) {
-                if (operation==1) {
-                    cout<<"ЗАШИФРОВАННАЯ СТРОКА: "<<cipher.coder(st)<<endl;
-                } else {
-                    cout<<"РАСШИФРОВАННАЯ СТРОКА: "<<cipher.decoder(st)<<endl;
+        wcout<<L"<Крипер> готов. Введи операцию (0-завершить, 1-зашифровать, 2-расшифровать): ";
+        wcin>>op;
+        if (op != 0 and op != 1 and op != 2) {
+            wcout<<L"НЕзаконная операция!\n";
+        } else if (op >0) {
+            wcout<<L"<Крипер> готов. Введи текст(без пробелов и капсом): ";
+            wcin.ignore(); 
+            getline(wcin, text);
+            if (isValid(text)) {
+                if (op == 1) {
+                    wcout<<L"Зашифрованный текст: "<<cipher.encrypt(text)<<endl;
+                } else if (op == 2){
+                    wcout<<L"Расшифрованный текст: "<<cipher.decrypt(text)<<endl;
                 }
             } else {
-                cout<<"НЕКОРРЕКТНАЯ СТРОКА.\n";
+                wcout<<L"Операция прервана.... неверный текст....\n";
             }
         }
-    } while (operation!=0);
-
+    } while (op != 0);
     return 0;
 }
